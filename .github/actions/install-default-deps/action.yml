@@ -1,0 +1,32 @@
+name: Install dependencies
+
+description: Install default dependencies
+inputs:
+  latest:
+    default: false
+    description: Install latest version
+  path:
+    default: .
+    description: Working directory
+
+runs:
+  using: composite
+  steps:
+    - id: prepare
+      name: Prepare
+      run: echo has-eslint=`if [ -f ./.eslintrc.react.yml ]; then echo true; else echo false; fi` >> $GITHUB_OUTPUT
+      shell: bash
+      working-directory: ${{ inputs.path }}
+
+    - env:
+        VERSION_TAG: ${{ inputs.latest == 'true' && '@latest' || '' }}
+      name: Run npm run scaffold
+      run: npm run scaffold --include-workspace-root --workspaces
+      shell: bash
+      working-directory: ${{ inputs.path }}
+
+    - continue-on-error: true
+      name: Run npm audit fix
+      run: npm audit fix --include-workspace-root --workspaces
+      shell: bash
+      working-directory: ${{ inputs.path }}

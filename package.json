@@ -1,0 +1,35 @@
+{
+  "name": "template-mock-bot",
+  "version": "0.0.0-0",
+  "license": "MIT",
+  "private": true,
+  "engines": {
+    "node": ">= 18"
+  },
+  "workspaces": [
+    "packages/bot/",
+    "packages/nodejs/",
+    "packages/offline-chat-adapter/",
+    "packages/pages/"
+  ],
+  "files": [
+    "iisnode.yml",
+    "packages/nodejs/bot/**/*",
+    "packages/nodejs/dist/**/*",
+    "packages/nodejs/offline-chat-adapter/**/*",
+    "web.config"
+  ],
+  "main": "./packages/nodejs/dist/index.global.js",
+  "exports": {
+    ".": {
+      "import": "./packages/bot/dist/index.mjs",
+      "browser": "./packages/offline-chat-adapter/dist/index.mjs"
+    }
+  },
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "precommit": "npm run precommit --workspaces",
+    "scaffold": "npm install --save-dev nodemon@latest && npm install --save-dev --workspaces @tsconfig/strictest@latest @typescript-eslint/eslint-plugin eslint@latest eslint-config-standard@latest eslint-plugin-import@latest eslint-plugin-prettier@latest eslint-plugin-promise@latest eslint-plugin-standard@latest prettier@latest typescript@latest",
+    "start": "nodemon --exec \"npm run build && node .\" --ext js,json,ts,tsx --verbose --watch './packages/*/src/**'"
+  }
+}
