@@ -1,11 +1,17 @@
 import './App.css';
 
-import { createDirectLine } from '@npm-workspace/offline-chat-adapter';
-import { memo, useMemo } from 'react';
-import WebChat from 'botframework-webchat';
+import { memo } from 'react';
+
+import { COMPLETE } from '../dova/chatbox/loadingStatus';
+import useWebChatFramework from '../dova/chatbox/useWebChatFramework';
+import WebChat from '../dova/webchat/WebChat';
 
 export default memo(function App() {
-  const directLine = useMemo(() => createDirectLine(), []);
+  const { loadingStatus, WebChatFramework } = useWebChatFramework({ timeout: 60_000 });
 
-  return <WebChat className="webchat" directLine={directLine} />;
+  return (
+    <div className="app">
+      {loadingStatus === COMPLETE && <WebChat apiSession={{}} WebChatFramework={WebChatFramework} />}
+    </div>
+  );
 });

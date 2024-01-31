@@ -1,11 +1,11 @@
-import { ConnectionStatus } from 'botframework-directlinejs';
 import { BotAdapter, TurnContext, type Activity, type ConversationReference } from 'botbuilder';
+import { ConnectionStatus } from 'botframework-directlinejs';
 import random from 'math-random';
 
 import { type LogicHandler } from './LogicHandler.js';
-import dateNow from './private/incrementalNow.js';
 import DeferredObservable from './private/DeferredObservable.js';
 import Observable from './private/Observable.js';
+import dateNow from './private/incrementalNow.js';
 import shareObservable from './private/shareObservable.js';
 
 export const USER_PROFILE = { id: 'user', role: 'user' };
@@ -55,6 +55,8 @@ export default class WebChatAdapter extends BotAdapter {
       this.#connectionStatusDeferred.next(2 satisfies ConnectionStatus.Online);
     });
 
+    let firstActivityPosted = false;
+
     this.#botConnection = {
       activity$: shareObservable(this.#activityDeferred.observable),
       connectionStatus$: shareObservable(this.#connectionStatusDeferred.observable),
@@ -66,6 +68,27 @@ export default class WebChatAdapter extends BotAdapter {
         const now = dateNow();
         const timestamp = new Date(now).toISOString();
         const id = now + Math.random().toString(36);
+
+        if (!firstActivityPosted) {
+          this.onReceive({
+            callerId: '',
+            channelId: 'offline',
+            conversation: { conversationType: '', id: this.#conversationId, isGroup: false, name: '' },
+            from: { id: 'offline', name: 'channel', role: 'channel' },
+            label: '',
+            listenFor: [],
+            localTimezone: 'America/Los_Angeles',
+            membersAdded: [{ id: 'u-00001', name: 'u-00001' }],
+            recipient: { id: 'bot', name: 'bot' },
+            serviceUrl: '',
+            text: '',
+            timestamp: new Date().toISOString(),
+            type: 'conversationUpdate',
+            valueType: ''
+          });
+
+          firstActivityPosted = true;
+        }
 
         return new Observable<string>(observer => {
           const serviceActivity: ServiceActivity = {
