@@ -148,7 +148,7 @@ export default class WebChatAdapter extends BotAdapter {
    * @param {TurnContext} context
    * @param {Activity[]} activities
    */
-  async sendActivities(_: TurnContext, activities: Activity[]) {
+  async sendActivities(context: TurnContext, activities: Activity[]) {
     const activityData = {
       channelId: 'webchat',
       conversation: { id: 'bot' },
@@ -156,7 +156,7 @@ export default class WebChatAdapter extends BotAdapter {
       recipient: USER_PROFILE
     };
 
-    const sentActivities = activities.map(activity => {
+    const sentActivities = activities.map(({ replyToId: _, ...activity }) => {
       const now = dateNow();
 
       return {
